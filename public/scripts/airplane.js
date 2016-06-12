@@ -125,8 +125,9 @@ Airplane.prototype.fire = function () {
 Airplane.prototype.getX = function (opt_speed) {
 
 	var self = this;
+	var airplaneWidth = self.$elem[0].offsetWidth;
 
-	return parseInt(self.$elem.css('left').replace(/(\D+)/, ''));
+	return parseInt(self.$elem.css('left').replace(/(\D+)/, ''))-airplaneWidth/2;
 
 };
 
@@ -138,8 +139,9 @@ Airplane.prototype.getX = function (opt_speed) {
 Airplane.prototype.getY = function (opt_speed) {
 
 	var self = this;
+	var airplaneheight = self.$elem[0].offsetHeight;
 
-	return parseInt(self.$elem.css('top').replace(/(\D+)/, ''));
+	return parseInt(self.$elem.css('top').replace(/(\D+)/, ''))-airplaneheight/2;
 
 };
 
