@@ -10,26 +10,18 @@
  * @param {[type]}  opt_x           初期位置のX座標 (オプション)
  * @param {[type]}  opt_y           初期位置のY座標 (オプション)
  */
-var Airplane = function ($elem, opt_is_reverse, opt_x, opt_y) {
+var Airplane = function ($elem, opt_x, opt_y) {
 
 	// 機体のDOM要素
 	this.$elem = $elem;
 
-	// 機体の向きが反転しているか否か
-	if (opt_is_reverse) {
+	self.oldX = this.getX();
+	self.oldY = this.getY();
 
-		this.isReverse = true; // 反転している
+	self.distanceX = 100;
+	self.distanceY = 100;
 
-		// CSSで画像を反転させる
-		this.$elem.css({
-			transform: 'scale(-1)'
-		});
-
-	} else {
-
-		this.isReverse = false; // 反転していない
-
-	}
+	self.isFire = false;
 
 	// 座標をリセット
 	opt_x = opt_x || 100;
@@ -66,6 +58,25 @@ Airplane.prototype.fire = function () {
 
 	var self = this;
 
+	// 変位を計算
+	var distanceX = (self.getX()-self.oldX);
+	var dustanceY = (self.getY()-self.oldY);
+	var distance  =  distanceX*distanceX + dustanceY*dustanceY;
+
+	// oldを更新
+	self.oldX = this.getX();
+	self.oldY = this.getY();
+
+	if(distance < 10000 && distance > 1000) {
+		self.isFire = true;
+		self.distanceX = distanceX;
+		self.distanceY = dustanceY;
+		return;
+	}else if(self.isFire != true) {
+		return;
+	}
+	self.isFire = false;
+
 	// 弾のDOM要素を生成
 	var $ball = $('<div />');
 
@@ -82,30 +93,30 @@ Airplane.prototype.fire = function () {
 	});
 
 	// 弾の位置を指定
-	var ball_x = self.getX() + 25; // 機体の中心となるX座標
-	var ball_y = self.getY(); // 機体と同じY座標
+	var ball_dx = self.distanceX/20; // 機体のX座標変位
+	var ball_dy = self.distanceY/20; // 機体のY座標変位
+	var ball_x = self.getX(); // 機体のX座標
+	var ball_y = self.getY(); // 機体のY座標
 	$ball.css({
-		left: ball_x,
-		top: ball_y
+		left: ball_x-25,
+		top: ball_y-25
 	});
 
 	// 弾を前へ移動させていくためのタイマーを生成
 	var interval = setInterval(function () {
 
-		// 弾のY座標を指定
+		// 弾の座標を変化させる
+		ball_x += ball_dx; // 弾を下へずらす
+		ball_y += ball_dy; // 弾を上へずらす
+
+		// 弾の位置を指定
 		$ball.css({
+			left: ball_x,
 			top: ball_y
 		});
 
-		// 弾のY座標を変化させる
-		if (self.isReverse) { // 機体が反転しているならば
-			ball_y += 10; // 弾を下へずらす
-		} else {
-			ball_y -= 10; // 弾を上へずらす
-		}
-
 		// 弾が画面外になったら
-		if (ball_y < 0 || $(window).height() < ball_y) {
+		if (ball_x < 0 ||  $(window).width() < ball_x || ball_y < 0 || $(window).height() < ball_y) {
 			// 弾を消す
 			$ball.remove();
 			$ball = null;
@@ -127,7 +138,7 @@ Airplane.prototype.getX = function (opt_speed) {
 	var self = this;
 	var airplaneWidth = self.$elem[0].offsetWidth;
 
-	return parseInt(self.$elem.css('left').replace(/(\D+)/, ''))-airplaneWidth/2;
+	return parseInt(self.$elem.css('left').replace(/px/, ''))+airplaneWidth/2;
 
 };
 
@@ -141,7 +152,7 @@ Airplane.prototype.getY = function (opt_speed) {
 	var self = this;
 	var airplaneheight = self.$elem[0].offsetHeight;
 
-	return parseInt(self.$elem.css('top').replace(/(\D+)/, ''))-airplaneheight/2;
+	return parseInt(self.$elem.css('top').replace(/px/, ''))+airplaneheight/2;
 
 };
 

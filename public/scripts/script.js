@@ -8,13 +8,20 @@ $(function () { // ページの読み込み(正しくはDOMの構築)が完了�
 	// 飛行機オブジェクトの初期化 - 自機
 	var player_x = $(window).width() / 2;
 	var player_y = $(window).height() - 100;
-	var player = new Airplane($('#player'), false, player_x, player_y);
+	var player = new Airplane($('#player'), player_x, player_y);
 
 	// 敵機による弾発射
 	window.setInterval(function () {
 
-
 	}, 1500);
+
+
+	// 自機による弾発射
+	window.setInterval(function () {
+
+		player.fire();
+
+	}, 10);
 
 	// キーが押されたときのイベントハンドラを定義
 	$("#view").bind("touchstart", function(e) {
